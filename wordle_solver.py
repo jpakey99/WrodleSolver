@@ -22,8 +22,11 @@ def remove_char_words(char, words):
 def remove_char_after_index_words(index, char, words):
     new_words = []
     for word in words:
-        if re.search(char, word[index+1:]) is None:
+        if len([*re.finditer(char, word)]):
             new_words.append(word)
+        elif re.search(char, word[index+1:]) is None:
+            new_words.append(word)
+
     return new_words
 
 
@@ -68,14 +71,13 @@ def get_probabilities(words):
     prob = {}
     for word in words:
         for i, c in enumerate(word):
-            if c in prob:
-                prob[c][str(i)] += 1
-            else:
+            if c not in prob:
                 prob[c] = {'0':0,
                            '1':0,
                            '2':0,
                            '3':0,
                            '4':0}
+            prob[c][str(i)] += 1
     return prob
 
 
@@ -101,10 +103,13 @@ def main():
         word = guess_word(words)
         result_string = input('Enter result string for word: ' + word)
         words = refine_words(word, result_string, words)
-        print(words)
+        if result_string == '22222':
+            print('CONGRATS, you solved the puzzle')
+            break
 
 
 main()
 # wordss = word_list()
 # wordss = refine_words('sleep', '22201', wordss)
+# wordss = remove_char_after_index_words(0, 'e', wordss)
 # print(wordss)
