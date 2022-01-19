@@ -12,19 +12,20 @@ def word_list():
 
 
 def remove_char_words(char, words):
+    new_words = []
     for word in words:
-        if re.search(char, word):
-            words.remove(word)
+        if re.search(char, word) is None:
+            new_words.append(word)
 
-    return words
+    return new_words
 
 
 def remove_char_after_index_words(index, char, words):
+    # refactor to be remove multiple instances of a char in a word
     new_words = []
     for word in words:
-        if len([*re.finditer(char, word)]):
-            new_words.append(word)
-        elif re.search(char, word[index+1:]) is None:
+        print(word, char, word.count(char))
+        if word.count(char) < 2:
             new_words.append(word)
 
     return new_words
@@ -55,15 +56,18 @@ def remove_all_but_char_at_index(index, char, words):
 def refine_words(guessed_word_string, result_string, words):
     previous_c = []
     for i, c in enumerate(guessed_word_string):
+        if result_string[i] == '2':
+            words = remove_all_but_char_at_index(i, c, words)
+            previous_c.append(c)
+    for i, c in enumerate(guessed_word_string):
+        if result_string[i] == '1':
+            words = remove_char_index_words(i, c, words)
+            previous_c.append(c)
+    for i, c in enumerate(guessed_word_string):
         if result_string[i] == '0' and c not in previous_c:
             words = remove_char_words(c, words)
         elif result_string[i] == '0' and c in previous_c:
             words = remove_char_after_index_words(i, c, words)
-        elif result_string[i] == '1':
-            words = remove_char_index_words(i, c, words)
-        elif result_string[i] == '2':
-            words = remove_all_but_char_at_index(i, c, words)
-        previous_c.append(c)
     return words
 
 
@@ -86,10 +90,14 @@ def guess_word(words):
     count = get_probabilities(words)
     current_champ_word, current_champ_amount = '', 0
     for word in words:
+        previous_letters = []
         word_likely_amount = 0
         for i, c in enumerate(word):
-            word_likely_amount += (count[c][str(i)]/length)
+            if c not in previous_letters:
+                word_likely_amount += (count[c][str(i)]/length)
+                previous_letters.append(c)
             word_likely_amount += ((count[c]['0'] + count[c]['1'] + count[c]['2'] + count[c]['3'] + count[c]['4'])/length)
+        # print(word, word_likely_amount)
         if word_likely_amount > current_champ_amount:
             current_champ_amount = word_likely_amount
             current_champ_word = word
