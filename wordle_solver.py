@@ -53,21 +53,36 @@ def remove_all_but_char_at_index(index, char, words):
     return new_words
 
 
-def refine_words(guessed_word_string, result_string, words):
-    previous_c = []
+def correct_char_guess(previous_c, guessed_word_string, result_string, words):
     for i, c in enumerate(guessed_word_string):
         if result_string[i] == '2':
             words = remove_all_but_char_at_index(i, c, words)
             previous_c.append(c)
+    return words, previous_c
+
+
+def wrong_char_location_guess(previous_c, guessed_word_string, result_string, words):
     for i, c in enumerate(guessed_word_string):
         if result_string[i] == '1':
             words = remove_char_index_words(i, c, words)
             previous_c.append(c)
+    return words, previous_c
+
+
+def wrong_char_guess(previous_c, guessed_word_string, result_string, words):
     for i, c in enumerate(guessed_word_string):
         if result_string[i] == '0' and c not in previous_c:
             words = remove_char_words(c, words)
         elif result_string[i] == '0' and c in previous_c:
             words = remove_char_after_index_words(i, c, words)
+    return words, previous_c
+
+
+def refine_words(guessed_word_string, result_string, words):
+    previous_c = []
+    words, previous_c = correct_char_guess(previous_c, guessed_word_string, result_string, words)
+    words, previous_c = wrong_char_location_guess(previous_c, guessed_word_string, result_string, words)
+    words, previous_c = wrong_char_guess(previous_c, guessed_word_string, result_string, words)
     return words
 
 
