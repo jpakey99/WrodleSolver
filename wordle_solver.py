@@ -24,7 +24,7 @@ def remove_char_after_index_words(index, char, words):
     # refactor to be remove multiple instances of a char in a word
     new_words = []
     for word in words:
-        print(word, char, word.count(char))
+        # print(word, char, word.count(char))
         if word.count(char) < 2:
             new_words.append(word)
 
@@ -124,7 +124,15 @@ def main():
     words = word_list()
     while i < 6:
         word = guess_word(words)
-        result_string = input('Enter result string for word: ' + word)
+        is_input_not_valid = True
+        while is_input_not_valid:
+            result_string = input('Enter result string for word: ' + word)
+            if len(result_string) == 5:
+                local_string_valid = True
+                for c in result_string:
+                    if c not in '012':
+                        local_string_valid = False
+                is_input_not_valid = not local_string_valid
         words = refine_words(word, result_string, words)
         if result_string == '22222':
             print('CONGRATS, you solved the puzzle')
